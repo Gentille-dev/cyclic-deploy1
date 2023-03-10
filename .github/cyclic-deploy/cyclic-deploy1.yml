@@ -1,0 +1,19 @@
+name: cyclic-deploy1
+
+on: push
+
+jobs:
+cyclic-deploy:
+name: lint code base
+runs-on: Intel  MacBook Pro
+
+steps:
+-name: Checkout code
+users: actions/checkout@v2
+
+-name: Run cyclic-deploy1
+uses: github/cyclic-deploy1@v3
+
+env: 
+DEFAULT_BRANCH: main
+GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
