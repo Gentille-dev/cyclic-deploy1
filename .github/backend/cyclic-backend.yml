@@ -1,0 +1,16 @@
+name: backend-cyclic
+
+on: push
+jobs:
+    backend-cyclic:
+name: cyclic-backend 
+runs-on: MacBook Pro
+steps:
+- name: Checkout code
+user: actions/checkout@v2
+
+-name: Run cyclic-backend
+user: github/cyclic-backend@v3
+env:
+DEFAULT_BRANCH: main
+GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
