@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../model/user.js";
 
-const secret = "hhhhhh";
+// const SECRET = "hdhsjSDDSkevin";
 
 const loginController = async (req, res) => {
   // email and password from the body
@@ -10,29 +10,37 @@ const loginController = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({
-        message: "User not Found, SignUp!"
+      return res.status(401).json({
+        message: "Invalid Credentials"
       });
     } else {
       // check if password is correct
-      const passwordMatch = await bcrypt.compare(password, user.password);
+      const compareHashedPassword = await bcrypt.compare(password, user.password);
 
       // conditions
-      if (!passwordMatch) {
-        return res.status(400).json({ message: 'User not Found, SignUp!' });
+      if (!compareHashedPassword) {
+        return res.status(400).json(
+          { message: 'Invalid Credentials' });
       } else {
         // create and sign JWT token
-        const token = jwt.sign({ userId: user._id }, secret, { expiresIn: '1d' });
+        const token = jwt.sign({isAdmin:user.isAdmin},process.env.SECRET
+        ,{expiresIn: '1d'})
+       
 
-        res.cookie('token', token, {
+        // testing cookies
+        return res.status(200).json ({
+          data: {
+            email:user.email,
+            isAdmin:user.isAdmin
+          },
+          token: token,
+          message: "logged in successfully"
+        })
+        res.cookie('accessToken', token, {
           httpOnly: true,
-          maxAge: 24 * 60 * 60 * 1000 // 1 day
-        });
-        res.status(200).json({
-          message: 'Login successful',
-          token: token
-        });
-      }
+          maxAge: 1000*60*60*24*1 // 1 day equal
+      })
+    }
     }
   } catch (error) {
     console.log(error);
@@ -40,7 +48,6 @@ const loginController = async (req, res) => {
       message: error.message
     });
   }
-
 };
 
 export default loginController;
